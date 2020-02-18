@@ -1,0 +1,17 @@
+{
+    "from_db": {
+        "host": "",
+        "port": "",
+        "name": "",
+        "username": "",
+        "password": ""
+    },
+    "to_db": {
+        "host": "",
+        "port": "",
+        "name": "",
+        "username": "",
+        "password": ""
+    }
+}
+
