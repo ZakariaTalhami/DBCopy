@@ -6,7 +6,7 @@ class MysqlConnection:
     Mysql connection handler
     """
 
-    _FETCH_TABLE = 'Select * from {}'
+    _FETCH_TABLE = "Select * from {}"
     _INSERT_TABLE = "INSERT INTO {table} ({cols}) values ({values})"
 
     def __init__(self, host, port, username, password, database, as_dict=True):
@@ -31,7 +31,7 @@ class MysqlConnection:
                 password=password,
                 host=host,
                 database=database,
-                port=port
+                port=port,
             )
             self._cursor = self._cnx.cursor(dictionary=as_dict)
         except mysql.connector.Error as err:
@@ -85,11 +85,9 @@ class MysqlConnection:
 
         for row in rows:
             try:
-                values_str = ", ".join(["'{}'".format(str_value) for str_value in row.values()])
+                values_str = self.create_value_string(row.values())
                 query = self._INSERT_TABLE.format(
-                    table=table,
-                    cols=cols_str,
-                    values=values_str
+                    table=table, cols=cols_str, values=values_str
                 )
                 print(query)
                 self._cursor.execute(query)
@@ -99,15 +97,23 @@ class MysqlConnection:
                 print("Duplicate, skipping.")
         self._cnx.commit()
 
+    def create_value_string(self, values):
+        values_list = []
+        for value in values:
+            value_formated = f"'{value}'" if value is not None else "NULL"
+            values_list.append(value_formated)
+
+        return ", ".join(values_list)
+
     def close(self):
         """
-            Close the connection and cursor to the database
+        Close the connection and cursor to the database
         """
         self._cursor.close()
         self._cnx.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pprint import pprint
 
     con1 = MysqlConnection(
@@ -126,7 +132,7 @@ if __name__ == '__main__':
         database="testee",
     )
 
-    res_rows, res_cols = con1.fetch_table('player')
+    res_rows, res_cols = con1.fetch_table("player")
     pprint(res_rows)
 
     con2.insert_table("player", res_rows, res_cols)

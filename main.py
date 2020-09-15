@@ -3,8 +3,11 @@ from settings_parser import SettingsParser, TablesParser
 from pprint import pprint
 import time
 from datetime import timedelta
+import os
 
-DEFAULT_SETTINGS_FILE = 'settings.json'
+DEFAULT_CONF_DIR = "conf"
+DEFAULT_SETTINGS_FILE = os.path.join(DEFAULT_CONF_DIR, "settings.json")
+DEFAULT_TABLES_FILE = os.path.join(DEFAULT_CONF_DIR, "tables.json")
 
 # time reporting
 SETTINGS_READ_TIME = 0
@@ -13,34 +16,41 @@ COPY_TIME = 0
 
 
 def report_time():
-    print(f'The script performed:')
-    print(f'\tRead settings: {timedelta(seconds=SETTINGS_READ_TIME)}')
-    print(f'\tConnect to databases: {timedelta(seconds=DB_CONNECT_TIME)}')
-    print(f'\tCopy tables: {timedelta(seconds=COPY_TIME)}')
+    print("The script performed:")
+    print(f"\tRead settings: {timedelta(seconds=SETTINGS_READ_TIME)}")
+    print(f"\tConnect to databases: {timedelta(seconds=DB_CONNECT_TIME)}")
+    print(f"\tCopy tables: {timedelta(seconds=COPY_TIME)}")
     pass
 
 
-if __name__ == "__main__":
+def extract_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
         "-c",
         "-conf",
         help="Requires the json for tables",
-        type=argparse.FileType('r'),
+        type=argparse.FileType("r"),
         dest="config",
-        default=DEFAULT_SETTINGS_FILE
+        default=DEFAULT_SETTINGS_FILE,
     )
     parser.add_argument(
         "-t",
         "-tableConf",
-        required=True,
         help="Requires the json for tables",
-        type=argparse.FileType('r'),
-        dest="tables"
+        type=argparse.FileType("r"),
+        dest="tables",
+        default=DEFAULT_TABLES_FILE,
     )
-    parser.add_argument("--skip_constraints", "-sc", action='store_true', dest="skip_constraint")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--skip_constraints", "-sc", action="store_true", dest="skip_constraint"
+    )
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = extract_args()
 
     skip_constraint = args.skip_constraint
 
